@@ -1,0 +1,76 @@
+swagger: '2.0'
+info:
+  version: "1"
+  title: AirWatch devices API
+  license:
+    name: 'Copyright © 2018 VMware Airwatch, LLC. All rights reserved.'
+host: www.api.airwatch.com
+schemes:
+  - https
+basePath: /groups
+
+securityDefinitions:
+  BasicAuth:
+    type: basic
+  ApiKeyAuth:
+    type: apiKey
+    in: header
+    name: aw-tenant-code
+  CmsAuth:
+    type: apiKey
+    in: header
+    name: authorization
+security:
+  - BasicAuth: []
+  - ApiKeyAuth: []
+  - CmsAuth: []
+
+paths:
+  /{groupUuid}/devices/{deviceUuid}:
+    get:
+      summary: Gets details about the device for an organization group
+      description: Retrieves information about the device for an organization group
+      parameters:
+        - name: groupUuid
+          in: path
+          required: true
+          description: Organization group Uuid
+          type: string
+          format: uuid
+        - name: deviceUuid
+          in: path
+          required: true
+          description: Device Uuid
+          type: string
+          format: uuid
+      produces:
+        - application/json
+      tags:
+        - DevicesV1
+      x-authorization: 
+        - ClaimsAuthorize(Devices.READ)
+    
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/GetDevicesV1ResponseModel'
+        '404':
+          description: |
+            1. {5061: Device not found for specified id}
+            2. {5060: Organization group not found for specified id}
+          schema:
+            $ref: "https://raw.githubusercontent.com/airwatch-api/swagger/master/CommonDefinitions.yaml#/definitions/BaseExceptionModel"                
+definitions:
+  GetDevicesV1ResponseModel:
+    type: object
+    description: Contains information about the device
+    x-ignore: true    
+    properties:
+      uuid:
+        description: Unique identifier of the device
+        type: string
+        format: uuid
+      name:
+        description: Friendly name of the device
+        type: string
